@@ -1,0 +1,2 @@
+-- Description: This file is used to initialize the database.
+--              It is executed when the database is created.

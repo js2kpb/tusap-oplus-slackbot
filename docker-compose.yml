@@ -1,0 +1,41 @@
+services:
+  app:
+    container_name: tusap-oplus-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      NODE_ENV: production
+    develop:
+      watch:
+      - action: sync
+        path: src
+        target: ./src
+      - action: rebuild
+        path: ./bun.lock
+      - action: rebuild
+        path: ./package.json
+    command: ["run", "--hot", "src/index.ts"]
+
+  db:
+    container_name: tusap-oplus-db
+    build: ./db
+    ports:
+      - ${DB_PORT}:5432
+    environment:
+      TZ: Asia/Tokyo
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: tusap-oplus-db
+    volumes:
+      - ./db/init:/docker-entrypoint-initdb.d
+      - db-data:/var/lib/postgresql/data
+
+# 名前付きボリュームの定義を追加
+volumes:
+  db-data:
+    driver: local
